@@ -20,7 +20,7 @@ class MainActivityKtTest{
     fun uiTest(){
         composeTest.setContent {
             BookStoreUMTheme {
-                ToBeTested()
+
             }
         }
         composeTest.onNodeWithText("Hello, World !").assertExists()
