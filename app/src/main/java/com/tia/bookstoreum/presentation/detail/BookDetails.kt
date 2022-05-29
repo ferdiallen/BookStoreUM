@@ -19,39 +19,42 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarConfig
 import com.gowtham.ratingbar.StepSize
+import com.tia.bookstoreum.R
+import com.tia.bookstoreum.navigation.NavAddress
+import org.koin.androidx.compose.get
 
-@Preview(showBackground = true)
 @Composable
 fun BookDetail(
-    bookName: String = "",
-    creatorName: String = "",
-    rating: Float = 0F,
-    aboutAuthorText: String = "",
-    coverImage: String = "",
-    overviewBook: String = "",
-    price: String = ""
+    id: Int,
+    controller: NavController
 ) {
+    val imagePlaceholder =
+        rememberAsyncImagePainter(model = stringResource(R.string.imgplaceholder))
     val context = LocalContext.current
     var ratingScore by remember {
         mutableStateOf(0F)
     }
-    ratingScore = rating
+    val viewModel = get<BookDetailViewModel>()
+    viewModel.retrieveSelectedData(id)
+    ratingScore = viewModel.bookDetails?.rating?.toFloat() ?: 0F
     Column(
         Modifier
             .fillMaxSize()
             .padding(start = 12.dp, end = 12.dp, top = 12.dp)
     ) {
         Row(Modifier.fillMaxWidth()) {
-            IconButton(onClick = { /*TODO*/ }, modifier = Modifier.weight(1F)) {
+            IconButton(onClick = { controller.popBackStack() }, modifier = Modifier.weight(1F)) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "backfrom details",
@@ -74,21 +77,22 @@ fun BookDetail(
         ) {
             item {
                 AsyncImage(
-                    model = coverImage,
+                    model = viewModel.bookDetails?.cover.toString(),
                     contentDescription = "cover image",
                     modifier = Modifier
-                        .size(221.dp, 280.dp)
-                        .clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.FillBounds
+                        .size(210.dp, 295.dp)
+                        .clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.FillBounds,
+                    error = imagePlaceholder
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = bookName,
+                    text = viewModel.bookDetails?.title.toString(),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 22.sp
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = creatorName,
+                    text = viewModel.bookDetails?.author.toString(),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 18.sp, color = Color.LightGray
                 )
@@ -111,7 +115,7 @@ fun BookDetail(
 
                     )
                     Text(
-                        text = aboutAuthorText,
+                        text = viewModel.bookDetails?.about.toString(),
                         textAlign = TextAlign.Justify,
                         color = Color.LightGray,
                         fontSize = 16.sp
@@ -127,7 +131,7 @@ fun BookDetail(
                             .fillMaxWidth()
                     )
                     Text(
-                        text = overviewBook,
+                        text = viewModel.bookDetails?.body.toString(),
                         textAlign = TextAlign.Justify,
                         color = Color.LightGray,
                         fontSize = 16.sp
@@ -139,11 +143,11 @@ fun BookDetail(
                         .padding(bottom = 12.dp, start = 12.dp)
                 ) {
                     ButtonBuyOrReadPreview(text = "Read Previews", color = Color.Red, onClick = {
-                        Toast.makeText(context, "Tapped", Toast.LENGTH_SHORT).show()
+                        controller.navigate(NavAddress.ReadBookScreen.route)
                     })
                     Spacer(modifier = Modifier.width(8.dp))
                     ButtonBuyOrReadPreview(
-                        text = "Buy for $${price}",
+                        text = "Buy for $ NoN",
                         color = Color.Black,
                         onClick = {
                             Toast.makeText(context, "Tapped", Toast.LENGTH_SHORT).show()

@@ -19,11 +19,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.tia.bookstoreum.ui.theme.BackgroundColor
 import com.tia.bookstoreum.ui.theme.SliderColor
 
 @Composable
-fun ReadBookScreen() {
+fun ReadBookScreen(
+    controller:NavController
+) {
     var textSize by remember {
         mutableStateOf(16)
     }
@@ -45,7 +48,7 @@ fun ReadBookScreen() {
             ) {
                 IconButton(
                     onClick = {
-
+                        controller.popBackStack()
                     },
                     modifier = Modifier
                         .size(26.dp)
